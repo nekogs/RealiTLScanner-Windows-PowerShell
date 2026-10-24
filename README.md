@@ -1,90 +1,65 @@
-# Reality - TLS - Scanner
+# RealiTLScanner.ps1 (Windows, PowerShell)
 
-## Building
+Порт [XTLS/RealiTLScanner](https://github.com/XTLS/RealiTLScanner) на PowerShell. Ищет TLS-серверы, которые подходят как `dest` для Xray REALITY: TLS 1.3, ALPN `h2`, в сертификате есть CN и организация издателя.
 
-Requirement: Go 1.21+
+Код оригинала на Go в репозиторий не входит: здесь только скрипт.
 
-```bash
-go build
+Версия для Windows, которой не нужны bash, python и openssl. Хватает встроенного Windows PowerShell 5.1 (есть в Windows 10/11) или PowerShell 7. Флаги, логи и CSV те же, что у оригинала.
+
+Штатный TLS Windows не отдаёт PowerShell 5.1 ни ALPN, ни группу обмена ключами. Поэтому в скрипт встроен небольшой TLS-клиент на C#: PowerShell компилирует его сам при запуске через `Add-Type`. Разбор сертификатов и чтение `Country.mmdb` тоже встроены.
+
+## Запуск
+
+По умолчанию Windows запрещает запуск скачанных `.ps1`, поэтому запускайте так:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\RealiTLScanner.ps1 -addr 1.2.3.4
+powershell -ExecutionPolicy Bypass -File .\RealiTLScanner.ps1 -in in.txt -thread 10 -v
+powershell -ExecutionPolicy Bypass -File .\RealiTLScanner.ps1 -url https://launchpad.net/ubuntu/+archivemirrors
 ```
 
-## Usage
+### Запуск мышкой
 
-It is recommended to run this tool locally, as running the scanner in the cloud may cause the VPS to be flagged.
-```bash
-# Show help
-./RealiTLScanner
+Если запустить скрипт из Проводника без параметров (правой кнопкой → «Выполнить с помощью PowerShell»), он сам спросит IP, CIDR или домен для сканирования. Неверный ввод он попросит повторить. Сканирование IP или домена идёт, пока не нажать Ctrl+C. Результат сохраняется в `out.csv` рядом со скриптом, а окно не закрывается, пока не нажать Enter. Обычный двойной клик по `.ps1` в Windows по умолчанию открывает файл в Блокноте, а не запускает его.
 
-# Scan a specific IP, IP CIDR or domain:
-./RealiTLScanner -addr 1.2.3.4
-# Note: infinity mode will be enabled automatically if `addr` is an IP or domain
+## Флаги
 
-# Scan a list of targets from a file (targets should be divided by line break):
-./RealiTLScanner -in in.txt
+Все флаги те же, что у оригинала: `-addr`, `-in`, `-url`, `-port`, `-thread`, `-timeout`, `-out`, `-v`, `-46`, `-raw`, `-check-dns`. Если консоль не в UTF-8, вместо значков печатаются `+`, `-`, `x`. Для GeoIP положите `Country.mmdb` в текущую папку. Ctrl+C останавливает скан.
 
-# Crawl domains from a URL and scan:
-./RealiTLScanner -url https://launchpad.net/ubuntu/+archivemirrors
+## Вывод
 
-# Specify a port to scan, default: 443
-./RealiTLScanner -addr 1.1.1.1 -port 443
+В терминале результат выводится цветной таблицей. Пока идёт сканирование, под таблицей обновляется строка статуса: сколько адресов проверено, сколько подошло, время и текущий адрес. В конце печатается итог: сколько адресов проверено и сколько подошло. Итог печатается и после Ctrl+C. С `-v` видны и неподходящие адреса с причиной (например, `not suitable: ALPN http/1.1`). Флаг `-raw` включает исходный формат логов RealiTLScanner. Он же используется сам, когда вывод перенаправлен в файл или в другую программу. Цвета можно отключить переменной окружения `NO_COLOR=1`. Формат CSV не меняется.
 
-# Show verbose output, including failed scans and infeasible targets:
-./RealiTLScanner -addr 1.2.3.0/24 -v
+## Проверка DNS и proxy-site
 
-# Save results to a file, default: out.csv
-./RealiTLScanner -addr www.microsoft.com -out file.csv
+По умолчанию для каждого подходящего адреса скрипт резолвит домен из сертификата. Результат выводится в колонке `DNS CHECK`. Если домен указывает на этот же IP или на его /24 (для IPv6 на /48), строка зелёная, а в колонке написано `matches IP`. Если домен живёт на других адресах или вообще не резолвится, строка жёлтая, в колонке написано `proxy-site`, а после стрелки указано, куда домен ведёт на самом деле. Обычно это чужой REALITY или SNI-прокси, который пересылает сертификат настоящего сайта. Для своего `dest` такие адреса брать не стоит.
 
-# Set a thread count, default: 1
-./RealiTLScanner -addr wiki.ubuntu.com -thread 10
+Пометка есть только в терминале. В CSV попадают все подходящие адреса, как в оригинале, а `-raw` печатает логи без изменений. Ответы DNS кешируются, поэтому на скорость проверка почти не влияет. Отключить её можно флагом `-check-dns=false`.
 
-# Set a timeout for each scan, default: 10 (seconds)
-./RealiTLScanner -addr 107.172.1.1/16 -timeout 5
 ```
-### In docker way
-Build container by yourself (you do not needed in golonag on your host)
-```bash
-docker build -t realitlscanner .
-```
-Run and research
-```bash
-# show help
-docker run --rm realitlscanner
-# scan
-docker run --rm realitlscanner -addr 1.1.1.1
-```
-### Enable Geo IP
+RealiTLScanner · -addr 144.31.182.166 · port 443 · 2 threads · timeout 10s · DNS check: on · CSV: out.csv
+    IP               CERT DOMAIN                     ISSUER                    TLS      ALPN  CURVE           GEO   DNS CHECK
+  ✔ 144.31.182.140   example-host.de                 Let's Encrypt             TLS 1.3  h2    X25519          DE    matches IP
+  ↪ 144.31.182.166   www.otto.de                     DigiCert Inc              TLS 1.3  h2    X25519          DE    proxy-site → 3.66.105.53
 
-To enable Geo IP information, place a MaxMind GeoLite2/GeoIP2 Country Database in the executing folder with the exact name `Country.mmdb`. You can download one from [here](https://github.com/Loyalsoldier/geoip/releases/latest/download/Country.mmdb).
-
-## Demo
-
-Example stdout:
-
-```bash
-2024/02/08 20:51:10 INFO Started all scanning threads time=2024-02-08T20:51:10.017+08:00
-2024/02/08 20:51:10 INFO Connected to target feasible=true host=107.172.103.9 tls=1.3 alpn=h2 domain=rocky-linux.tk issuer="Let's Encrypt"
-2024/02/08 20:51:10 INFO Connected to target feasible=true host=107.172.103.11 tls=1.3 alpn=h2 domain=rn.allinai.dev issuer="Let's Encrypt"
-2024/02/08 20:51:13 INFO Connected to target feasible=true host=107.172.103.16 tls=1.3 alpn=h2 domain=san.hiddify01.foshou.vip issuer="Let's Encrypt"
-2024/02/08 20:51:13 INFO Connected to target feasible=true host=107.172.103.19 tls=1.3 alpn=h2 domain=mgzx19.cnscholar.top issuer="Let's Encrypt"
-2024/02/08 20:51:13 INFO Connected to target feasible=true host=107.172.103.22 tls=1.3 alpn=h2 domain=hy2.znull.top issuer=ZeroSSL
-2024/02/08 20:51:21 INFO Connected to target feasible=true host=107.172.103.37 tls=1.3 alpn=h2 domain=c1.webgenbd.com issuer="Let's Encrypt"
-2024/02/08 20:51:23 INFO Connected to target feasible=true host=107.172.103.46 tls=1.3 alpn=h2 domain=racknerd.myideal.xyz issuer="Let's Encrypt"
-2024/02/08 20:51:38 INFO Scanning completed time=2024-02-08T20:51:38.988+08:00 elapsed=28.97043s
+Stopped in 1m2.3s · checked 120 · suitable 1 · proxy-site 1 · saved to out.csv
 ```
 
-Example output file:
+Лучше запускать локально: сканирование с VPS может привести к тому, что хостер пометит сервер.
+
+## GeoIP
+
+Положите базу MaxMind GeoLite2/GeoIP2 Country в текущую папку под именем `Country.mmdb`, например [отсюда](https://github.com/Loyalsoldier/geoip/releases/latest/download/Country.mmdb). Читатель базы встроен в скрипт.
+
+## Формат результата
 
 ```csv
-IP,ORIGIN,CERT_DOMAIN,CERT_ISSUER,GEO_CODE
-202.70.64.2,ntc.net.np,*.ntc.net.np,"GlobalSign nv-sa",NP
-196.200.160.70,mirror.marwan.ma,mirror.marwan.ma,"Let's Encrypt",MA
-103.194.167.213,mirror.i3d.net,*.i3d.net,"Sectigo Limited",JP
-194.127.172.131,nl.mirrors.clouvider.net,nl.mirrors.clouvider.net,"Let's Encrypt",NL
-202.36.220.86,mirror.2degrees.nz,mirror.2degrees.nz,"Let's Encrypt",NZ
-202.36.220.86,ubuntu.mirrors.theom.nz,mirror.2degrees.nz,"Let's Encrypt",NZ
-158.37.28.65,ubuntu.hi.no,alma.hi.no,"Let's Encrypt",NO
-193.136.164.6,ftp.rnl.tecnico.ulisboa.pt,ftp.rnl.ist.utl.pt,"Let's Encrypt",PT
-75.2.60.5,cesium.di.uminho.pt,cesium.di.uminho.pt,"Let's Encrypt",US
-195.14.50.21,mirror.corbina.net,ftp.corbina.net,"Let's Encrypt",RU
+IP,ORIGIN,TLS,ALPN,CURVE,CERT_LENGTH,CERT_SIGNATURE,CERT_PUBLICKEY,CERT_DOMAIN,CERT_ISSUER,GEO_CODE
+1.2.3.4,example.com,TLS 1.3,h2,X25519,2728(certs count: 3),SHA256-RSA,RSA,example.com,"Let's Encrypt",US
 ```
 
+## Отличия от Go-версии
+
+- В `CURVE` будет `X25519` даже там, где Go договорится о `X25519MLKEM768`: постквантовый обмен в скрипт не встроен. Ответ `feasible` от этого не меняется.
+- Рукопожатие доводится до получения сертификатов, а не до конца. Целостность зашифрованных записей и подписи сервера не проверяются. Для сканера это не важно, но клиент не годится ни для чего, кроме чтения параметров сервера.
+- Текст ошибок DNS и HTTP в подробном логе другой.
