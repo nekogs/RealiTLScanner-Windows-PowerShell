@@ -6,7 +6,7 @@
 
 ## دانلود
 
-[آرشیو ZIP](https://github.com/nekogs/RealiTLScanner-Windows-PowerShell/archive/refs/heads/main.zip) را دانلود کنید (یا در همین صفحه Code ← Download ZIP) و در هر پوشه‌ای از حالت فشرده خارج کنید. داخل آن `RealiTLScanner.ps1` و `RealiTLScanner.cmd` است. چیز دیگری لازم نیست: Windows PowerShell 5.1 در ویندوز 10/11 یا PowerShell 7 کافی است.
+[آرشیو ZIP](https://github.com/nekogs/RealiTLScanner-Windows-PowerShell/releases/latest/download/RealiTLScanner-Windows-PowerShell-main.zip) را دانلود کنید و در هر پوشه‌ای از حالت فشرده خارج کنید. داخل آن `RealiTLScanner.ps1` و `RealiTLScanner.cmd` است. چیز دیگری لازم نیست: Windows PowerShell 5.1 در ویندوز 10/11 یا PowerShell 7 کافی است.
 
 ## اجرا
 
