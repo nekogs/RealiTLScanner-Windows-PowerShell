@@ -1,65 +1,84 @@
-# RealiTLScanner.ps1 (Windows, PowerShell)
+<p dir="auto"><a href="/README.md">English</a> | <a href="/README.fa.md">فارسی</a> | <a href="/README.ar_EG.md">العربية</a> | <a href="/README.zh.md">中文</a> | <a href="/README.es.md">Español</a> | <a href="/README.ru.md">Русский</a> | <a href="/README.tr_TR.md">Türkçe</a></p>
 
-Порт [XTLS/RealiTLScanner](https://github.com/XTLS/RealiTLScanner) на PowerShell. Ищет TLS-серверы, которые подходят как `dest` для Xray REALITY: TLS 1.3, ALPN `h2`, в сертификате есть CN и организация издателя.
+# RealiTLScanner — Windows PowerShell
 
-Код оригинала на Go в репозиторий не входит: здесь только скрипт.
+A port of [XTLS/RealiTLScanner](https://github.com/XTLS/RealiTLScanner) to PowerShell. It looks for TLS servers that suit Xray REALITY as `dest`: TLS 1.3, ALPN `h2`, and a certificate with a CN and an issuer organization. The script also checks DNS and highlights other people's proxy sites.
 
-Версия для Windows, которой не нужны bash, python и openssl. Хватает встроенного Windows PowerShell 5.1 (есть в Windows 10/11) или PowerShell 7. Флаги, логи и CSV те же, что у оригинала.
+## Download
 
-Штатный TLS Windows не отдаёт PowerShell 5.1 ни ALPN, ни группу обмена ключами. Поэтому в скрипт встроен небольшой TLS-клиент на C#: PowerShell компилирует его сам при запуске через `Add-Type`. Разбор сертификатов и чтение `Country.mmdb` тоже встроены.
+Download `RealiTLScanner-windows.zip` from [Releases](https://github.com/nekogs/RealiTLScanner-Windows-PowerShell/releases/latest) and unpack it into any folder. It holds `RealiTLScanner.ps1` and `RealiTLScanner.cmd`. Nothing else is needed: Windows PowerShell 5.1 from Windows 10/11 or PowerShell 7 is enough.
 
-## Запуск
+## Run
 
-По умолчанию Windows запрещает запуск скачанных `.ps1`, поэтому запускайте так:
+Windows does not run downloaded `.ps1` files by default, so start the script like this:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\RealiTLScanner.ps1 -addr 1.2.3.4
-powershell -ExecutionPolicy Bypass -File .\RealiTLScanner.ps1 -in in.txt -thread 10 -v
-powershell -ExecutionPolicy Bypass -File .\RealiTLScanner.ps1 -url https://launchpad.net/ubuntu/+archivemirrors
 ```
 
-### Запуск мышкой
+### Run with a double click
 
-Если запустить скрипт из Проводника без параметров (правой кнопкой → «Выполнить с помощью PowerShell»), он сам спросит IP, CIDR или домен для сканирования. Неверный ввод он попросит повторить. Сканирование IP или домена идёт, пока не нажать Ctrl+C. Результат сохраняется в `out.csv` рядом со скриптом, а окно не закрывается, пока не нажать Enter. Обычный двойной клик по `.ps1` в Windows по умолчанию открывает файл в Блокноте, а не запускает его.
+Double-click `RealiTLScanner.cmd`. It starts the script and asks for an IP, CIDR or domain to scan. An IP or a domain is scanned until you press Ctrl+C. The results are saved to `out.csv` next to the script, and the window stays open until you press Enter. If Windows shows "Windows protected your PC", click "More info" and then "Run anyway".
 
-## Флаги
+## Usage
 
-Все флаги те же, что у оригинала: `-addr`, `-in`, `-url`, `-port`, `-thread`, `-timeout`, `-out`, `-v`, `-46`, `-raw`, `-check-dns`. Если консоль не в UTF-8, вместо значков печатаются `+`, `-`, `x`. Для GeoIP положите `Country.mmdb` в текущую папку. Ctrl+C останавливает скан.
+It is recommended to run the scanner locally: running it on a VPS may get the server flagged.
 
-## Вывод
+The commands below are run in a PowerShell window opened in the script folder. Run this once in that window first:
 
-В терминале результат выводится цветной таблицей. Пока идёт сканирование, под таблицей обновляется строка статуса: сколько адресов проверено, сколько подошло, время и текущий адрес. В конце печатается итог: сколько адресов проверено и сколько подошло. Итог печатается и после Ctrl+C. С `-v` видны и неподходящие адреса с причиной (например, `not suitable: ALPN http/1.1`). Флаг `-raw` включает исходный формат логов RealiTLScanner. Он же используется сам, когда вывод перенаправлен в файл или в другую программу. Цвета можно отключить переменной окружения `NO_COLOR=1`. Формат CSV не меняется.
-
-## Проверка DNS и proxy-site
-
-По умолчанию для каждого подходящего адреса скрипт резолвит домен из сертификата. Результат выводится в колонке `DNS CHECK`. Если домен указывает на этот же IP или на его /24 (для IPv6 на /48), строка зелёная, а в колонке написано `matches IP`. Если домен живёт на других адресах или вообще не резолвится, строка жёлтая, в колонке написано `proxy-site`, а после стрелки указано, куда домен ведёт на самом деле. Обычно это чужой REALITY или SNI-прокси, который пересылает сертификат настоящего сайта. Для своего `dest` такие адреса брать не стоит.
-
-Пометка есть только в терминале. В CSV попадают все подходящие адреса, как в оригинале, а `-raw` печатает логи без изменений. Ответы DNS кешируются, поэтому на скорость проверка почти не влияет. Отключить её можно флагом `-check-dns=false`.
-
-```
-RealiTLScanner · -addr 144.31.182.166 · port 443 · 2 threads · timeout 10s · DNS check: on · CSV: out.csv
-    IP               CERT DOMAIN                     ISSUER                    TLS      ALPN  CURVE           GEO   DNS CHECK
-  ✔ 144.31.182.140   example-host.de                 Let's Encrypt             TLS 1.3  h2    X25519          DE    matches IP
-  ↪ 144.31.182.166   www.otto.de                     DigiCert Inc              TLS 1.3  h2    X25519          DE    proxy-site → 3.66.105.53
-
-Stopped in 1m2.3s · checked 120 · suitable 1 · proxy-site 1 · saved to out.csv
+```powershell
+Set-ExecutionPolicy -Scope Process Bypass -Force
 ```
 
-Лучше запускать локально: сканирование с VPS может привести к тому, что хостер пометит сервер.
+```powershell
+# Show help
+.\RealiTLScanner.ps1
 
-## GeoIP
+# Scan a specific IP, IP CIDR or domain:
+.\RealiTLScanner.ps1 -addr 1.2.3.4
+# Note: infinite mode turns on automatically when `addr` is an IP or a domain (ip, ip-1, ip+1, ... until Ctrl+C)
 
-Положите базу MaxMind GeoLite2/GeoIP2 Country в текущую папку под именем `Country.mmdb`, например [отсюда](https://github.com/Loyalsoldier/geoip/releases/latest/download/Country.mmdb). Читатель базы встроен в скрипт.
+# Scan a list of targets from a file (one per line):
+.\RealiTLScanner.ps1 -in in.txt
 
-## Формат результата
+# Crawl domains from a URL and scan them:
+.\RealiTLScanner.ps1 -url https://launchpad.net/ubuntu/+archivemirrors
 
-```csv
-IP,ORIGIN,TLS,ALPN,CURVE,CERT_LENGTH,CERT_SIGNATURE,CERT_PUBLICKEY,CERT_DOMAIN,CERT_ISSUER,GEO_CODE
-1.2.3.4,example.com,TLS 1.3,h2,X25519,2728(certs count: 3),SHA256-RSA,RSA,example.com,"Let's Encrypt",US
+# Specify a port to scan, default: 443
+.\RealiTLScanner.ps1 -addr 1.1.1.1 -port 443
+
+# Show verbose output, including failed scans and unsuitable targets:
+.\RealiTLScanner.ps1 -addr 1.2.3.0/24 -v
+
+# Save results to a file, default: out.csv
+.\RealiTLScanner.ps1 -addr www.microsoft.com -out file.csv
+
+# Set a thread count, default: 2
+.\RealiTLScanner.ps1 -addr wiki.ubuntu.com -thread 10
+
+# Set a timeout for each scan, default: 10 (seconds)
+.\RealiTLScanner.ps1 -addr 107.172.1.1/16 -timeout 5
+
+# Scan IPv6 addresses as well as IPv4:
+.\RealiTLScanner.ps1 -in in.txt -46
+
+# Turn off the DNS check of the certificate domain (on by default):
+.\RealiTLScanner.ps1 -addr 1.2.3.4 -check-dns=false
+
+# Print logs in the format of the original RealiTLScanner:
+.\RealiTLScanner.ps1 -addr 1.2.3.4 -raw
 ```
 
-## Отличия от Go-версии
+### Enable GeoIP
 
-- В `CURVE` будет `X25519` даже там, где Go договорится о `X25519MLKEM768`: постквантовый обмен в скрипт не встроен. Ответ `feasible` от этого не меняется.
-- Рукопожатие доводится до получения сертификатов, а не до конца. Целостность зашифрованных записей и подписи сервера не проверяются. Для сканера это не важно, но клиент не годится ни для чего, кроме чтения параметров сервера.
-- Текст ошибок DNS и HTTP в подробном логе другой.
+To show the country of each IP, put a MaxMind GeoLite2/GeoIP2 Country database named `Country.mmdb` into the folder you run the script from. You can download one [here](https://github.com/Loyalsoldier/geoip/releases/latest/download/Country.mmdb).
+
+## Support the author
+
+The script's author is a political prisoner in Russia. If you can spare something for
+instant noodles, I'd be grateful!
+
+|           | Address                                                                 |
+|-----------|-----------------------------------------------------------------------|
+| 💵 USDT (ERC-20) | `0x23c23dc5ed6888d9287da95cba454d4889241202` |
+| ₿ BTC      | `bc1q7x2ez0atrtgq0qc5n3phszud0d3geuqvzhhhtu` |

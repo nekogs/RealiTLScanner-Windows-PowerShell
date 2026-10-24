@@ -2022,7 +2022,9 @@ function Test-StartedFromExplorer {
 }
 
 $scanArgs = [string[]]@($args | ForEach-Object { "$_" })
-$interactive = $scanArgs.Count -eq 0 -and (Test-StartedFromExplorer)
+# RealiTLScanner.cmd (the double-click launcher) sets RTS_LAUNCHER when it got no arguments
+$interactive = $scanArgs.Count -eq 0 -and -not [Console]::IsInputRedirected -and
+    ($env:RTS_LAUNCHER -eq '1' -or (Test-StartedFromExplorer))
 $workDir = (Get-Location).ProviderPath
 if ($interactive) {
     # Explorer may start us in another folder: keep the CSV and Country.mmdb next to the script
