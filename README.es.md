@@ -6,7 +6,7 @@ Port de [XTLS/RealiTLScanner](https://github.com/XTLS/RealiTLScanner) a PowerShe
 
 ## Descarga
 
-Descarga `RealiTLScanner-windows.zip` desde [Releases](https://github.com/nekogs/RealiTLScanner-Windows-PowerShell/releases/latest) y descomprímelo en cualquier carpeta. Contiene `RealiTLScanner.ps1` y `RealiTLScanner.cmd`. No hace falta nada más: basta con Windows PowerShell 5.1 de Windows 10/11 o PowerShell 7.
+Descarga [el archivo ZIP](https://github.com/nekogs/RealiTLScanner-Windows-PowerShell/archive/refs/heads/main.zip) (o Code → Download ZIP en esta página) y descomprímelo en cualquier carpeta. Contiene `RealiTLScanner.ps1` y `RealiTLScanner.cmd`. No hace falta nada más: basta con Windows PowerShell 5.1 de Windows 10/11 o PowerShell 7.
 
 ## Ejecución
 
