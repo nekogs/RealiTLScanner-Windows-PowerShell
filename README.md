@@ -10,15 +10,24 @@ Download [the ZIP archive](https://github.com/nekogs/RealiTLScanner-Windows-Powe
 
 ## Run
 
+### Option 1: double-click RealiTLScanner.cmd
+
+Double-click `RealiTLScanner.cmd`. It starts the script and asks for an IP, CIDR or domain to scan. An IP or a domain is scanned until you press Ctrl+C. The results are saved to `out.csv` next to the script, and the window stays open until you press Enter. If Windows shows "Windows protected your PC", click "More info" and then "Run anyway".
+
+### Option 2: from a PowerShell window
+
+First open a PowerShell window in one of two ways:
+
+1. In Explorer, open the folder with the script, hold **Shift**, right-click an empty spot in the folder and choose "Open PowerShell window here" (on Windows 11: right-click → "Open in Terminal"). The window opens right in the script folder.
+2. Open **Start**, type `PowerShell` and launch Windows PowerShell. The window opens in your home folder, so give the script its full path (see below).
+
 Windows does not run downloaded `.ps1` files by default, so start the script like this:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\RealiTLScanner.ps1 -addr 1.2.3.4
 ```
 
-### Run with a double click
-
-Double-click `RealiTLScanner.cmd`. It starts the script and asks for an IP, CIDR or domain to scan. An IP or a domain is scanned until you press Ctrl+C. The results are saved to `out.csv` next to the script, and the window stays open until you press Enter. If Windows shows "Windows protected your PC", click "More info" and then "Run anyway".
+If the window is not in the script folder, replace `.\RealiTLScanner.ps1` with the full path to the script. The easiest way: type `powershell -ExecutionPolicy Bypass -File ` (with a space at the end), drag `RealiTLScanner.ps1` from Explorer into the PowerShell window so Windows pastes its path, then add ` -addr 1.2.3.4` and press Enter.
 
 ## Usage
 

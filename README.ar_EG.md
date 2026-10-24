@@ -10,15 +10,24 @@
 
 ## التشغيل
 
+### الطريقة 1: النقر المزدوج على RealiTLScanner.cmd
+
+انقر نقرًا مزدوجًا على `RealiTLScanner.cmd`. سيبدأ السكربت ويطلب عنوان IP أو CIDR أو نطاقًا للفحص. يستمر فحص IP أو النطاق حتى تضغط Ctrl+C. تُحفظ النتائج في `out.csv` بجانب السكربت، وتبقى النافذة مفتوحة حتى تضغط Enter. إذا ظهرت رسالة «Windows protected your PC»، فانقر «More info» ثم «Run anyway».
+
+### الطريقة 2: من نافذة PowerShell
+
+افتح أولًا نافذة PowerShell بإحدى طريقتين:
+
+1. في مستكشف الملفات افتح المجلد الذي يحتوي على السكربت، واضغط مع الاستمرار على **Shift**، ثم انقر بزر الفأرة الأيمن على مساحة فارغة في المجلد واختر «Open PowerShell window here» (في Windows 11: النقر بالزر الأيمن ← «Open in Terminal»). ستُفتح النافذة مباشرة في مجلد السكربت.
+2. افتح قائمة **Start**، واكتب `PowerShell` وشغّل Windows PowerShell. ستُفتح النافذة في مجلد المستخدم، لذا يجب إعطاء المسار الكامل للسكربت (انظر أدناه).
+
 لا يشغّل Windows ملفات `.ps1` المُنزّلة افتراضيًا، لذا شغّل السكربت هكذا:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\RealiTLScanner.ps1 -addr 1.2.3.4
 ```
 
-### التشغيل بنقرة مزدوجة
-
-انقر نقرًا مزدوجًا على `RealiTLScanner.cmd`. سيبدأ السكربت ويطلب عنوان IP أو CIDR أو نطاقًا للفحص. يستمر فحص IP أو النطاق حتى تضغط Ctrl+C. تُحفظ النتائج في `out.csv` بجانب السكربت، وتبقى النافذة مفتوحة حتى تضغط Enter. إذا ظهرت رسالة «Windows protected your PC»، فانقر «More info» ثم «Run anyway».
+إذا لم تكن النافذة مفتوحة في مجلد السكربت، فاستبدل `.\RealiTLScanner.ps1` بالمسار الكامل للسكربت. أسهل طريقة: اكتب `powershell -ExecutionPolicy Bypass -File ` (مع مسافة في النهاية)، ثم اسحب `RealiTLScanner.ps1` من مستكشف الملفات إلى نافذة PowerShell ليُدرج Windows مساره، ثم أضف ` -addr 1.2.3.4` واضغط Enter.
 
 ## الاستخدام
 

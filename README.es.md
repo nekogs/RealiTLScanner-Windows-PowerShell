@@ -10,15 +10,24 @@ Descarga [el archivo ZIP](https://github.com/nekogs/RealiTLScanner-Windows-Power
 
 ## Ejecución
 
+### Opción 1: doble clic en RealiTLScanner.cmd
+
+Haz doble clic en `RealiTLScanner.cmd`. Inicia el script, que pide una IP, un CIDR o un dominio para escanear. Una IP o un dominio se escanea hasta que pulses Ctrl+C. Los resultados se guardan en `out.csv` junto al script y la ventana permanece abierta hasta que pulses Enter. Si Windows muestra «Windows protegió su PC», haz clic en «Más información» y luego en «Ejecutar de todas formas».
+
+### Opción 2: desde una ventana de PowerShell
+
+Primero abre una ventana de PowerShell de una de estas dos formas:
+
+1. En el Explorador, abre la carpeta del script, mantén pulsada **Shift**, haz clic derecho en un espacio vacío de la carpeta y elige «Abrir la ventana de PowerShell aquí» (en Windows 11: clic derecho → «Abrir en Terminal»). La ventana se abre directamente en la carpeta del script.
+2. Abre **Inicio**, escribe `PowerShell` e inicia Windows PowerShell. La ventana se abre en tu carpeta de usuario, así que indica la ruta completa del script (ver abajo).
+
 Por defecto Windows no ejecuta archivos `.ps1` descargados, así que inicia el script así:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\RealiTLScanner.ps1 -addr 1.2.3.4
 ```
 
-### Ejecutar con doble clic
-
-Haz doble clic en `RealiTLScanner.cmd`. Inicia el script, que pide una IP, un CIDR o un dominio para escanear. Una IP o un dominio se escanea hasta que pulses Ctrl+C. Los resultados se guardan en `out.csv` junto al script y la ventana permanece abierta hasta que pulses Enter. Si Windows muestra «Windows protegió su PC», haz clic en «Más información» y luego en «Ejecutar de todas formas».
+Si la ventana no está en la carpeta del script, sustituye `.\RealiTLScanner.ps1` por la ruta completa del script. Lo más fácil: escribe `powershell -ExecutionPolicy Bypass -File ` (con un espacio al final), arrastra `RealiTLScanner.ps1` desde el Explorador a la ventana de PowerShell para que Windows pegue su ruta, añade ` -addr 1.2.3.4` y pulsa Enter.
 
 ## Uso
 

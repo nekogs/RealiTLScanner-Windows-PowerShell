@@ -10,15 +10,24 @@
 
 ## 运行
 
+### 方式一：双击 RealiTLScanner.cmd
+
+双击 `RealiTLScanner.cmd`。它会启动脚本，并询问要扫描的 IP、CIDR 或域名。扫描 IP 或域名时会一直进行，直到按下 Ctrl+C。结果保存在脚本旁边的 `out.csv` 中，窗口会保持打开，直到按下 Enter。如果 Windows 显示 “Windows 已保护你的电脑”，请点击 “更多信息”，然后点击 “仍要运行”。
+
+### 方式二：在 PowerShell 窗口中运行
+
+先用以下两种方式之一打开 PowerShell 窗口：
+
+1. 在资源管理器中打开脚本所在文件夹，按住 **Shift**，在文件夹空白处单击右键，选择“在此处打开 PowerShell 窗口”（Windows 11：右键 → “在终端中打开”）。窗口会直接在脚本文件夹中打开。
+2. 打开**开始**菜单，输入 `PowerShell` 并启动 Windows PowerShell。窗口会在用户文件夹中打开，因此需要给出脚本的完整路径（见下文）。
+
 Windows 默认不运行下载的 `.ps1` 文件，因此请这样启动脚本：
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\RealiTLScanner.ps1 -addr 1.2.3.4
 ```
 
-### 双击运行
-
-双击 `RealiTLScanner.cmd`。它会启动脚本，并询问要扫描的 IP、CIDR 或域名。扫描 IP 或域名时会一直进行，直到按下 Ctrl+C。结果保存在脚本旁边的 `out.csv` 中，窗口会保持打开，直到按下 Enter。如果 Windows 显示 “Windows 已保护你的电脑”，请点击 “更多信息”，然后点击 “仍要运行”。
+如果窗口不在脚本所在文件夹，请把 `.\RealiTLScanner.ps1` 换成脚本的完整路径。最简单的方法：输入 `powershell -ExecutionPolicy Bypass -File `（末尾带一个空格），把 `RealiTLScanner.ps1` 从资源管理器拖进 PowerShell 窗口，Windows 会自动粘贴它的路径，然后补上 ` -addr 1.2.3.4` 并按 Enter。
 
 ## 用法
 

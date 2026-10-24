@@ -10,15 +10,24 @@
 
 ## Çalıştırma
 
+### Yöntem 1: RealiTLScanner.cmd dosyasına çift tıklayın
+
+`RealiTLScanner.cmd` dosyasına çift tıklayın. Betiği başlatır ve taranacak bir IP, CIDR veya alan adı sorar. IP veya alan adı, Ctrl+C tuşlarına basana kadar taranır. Sonuçlar betiğin yanındaki `out.csv` dosyasına kaydedilir ve pencere Enter tuşuna basana kadar açık kalır. Windows "Windows bilgisayarınızı korudu" uyarısı gösterirse "Ek bilgi"ye, ardından "Yine de çalıştır"a tıklayın.
+
+### Yöntem 2: PowerShell penceresinden
+
+Önce iki yoldan biriyle bir PowerShell penceresi açın:
+
+1. Dosya Gezgini'nde betiğin bulunduğu klasörü açın, **Shift** tuşunu basılı tutun, klasördeki boş bir alana sağ tıklayın ve "PowerShell penceresini burada açın" seçeneğini seçin (Windows 11'de: sağ tık → "Terminalde aç"). Pencere doğrudan betik klasöründe açılır.
+2. **Başlat** menüsünü açın, `PowerShell` yazın ve Windows PowerShell'i başlatın. Pencere kullanıcı klasörünüzde açılır, bu yüzden betiğin tam yolunu vermeniz gerekir (aşağıya bakın).
+
 Windows varsayılan olarak indirilen `.ps1` dosyalarını çalıştırmaz, bu yüzden betiği şöyle başlatın:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\RealiTLScanner.ps1 -addr 1.2.3.4
 ```
 
-### Çift tıklayarak çalıştırma
-
-`RealiTLScanner.cmd` dosyasına çift tıklayın. Betiği başlatır ve taranacak bir IP, CIDR veya alan adı sorar. IP veya alan adı, Ctrl+C tuşlarına basana kadar taranır. Sonuçlar betiğin yanındaki `out.csv` dosyasına kaydedilir ve pencere Enter tuşuna basana kadar açık kalır. Windows "Windows bilgisayarınızı korudu" uyarısı gösterirse "Ek bilgi"ye, ardından "Yine de çalıştır"a tıklayın.
+Pencere betik klasöründe değilse `.\RealiTLScanner.ps1` yerine betiğin tam yolunu yazın. En kolay yol: `powershell -ExecutionPolicy Bypass -File ` yazın (sonunda bir boşlukla), `RealiTLScanner.ps1` dosyasını Dosya Gezgini'nden PowerShell penceresine sürükleyin, Windows yolunu yapıştırır; ardından ` -addr 1.2.3.4` ekleyip Enter'a basın.
 
 ## Kullanım
 
